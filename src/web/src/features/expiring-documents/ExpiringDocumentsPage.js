@@ -1,0 +1,10 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { ALICE_PROPERTY_ID } from "../../api/config";
+import { DocumentRow } from "./DocumentRow";
+import styles from "./ExpiringDocumentsPage.module.css";
+import { useExpiringDocuments } from "./useExpiringDocuments";
+export function ExpiringDocumentsPage() {
+    const { documents, status, loadError, snoozeError, snoozingIds, snooze, refresh } = useExpiringDocuments();
+    return (_jsxs("section", { className: styles.page, children: [_jsxs("header", { className: styles.header, children: [_jsx("h1", { className: styles.title, children: "Expiring documents" }), _jsxs("p", { className: styles.subtitle, children: ["Property ", _jsx("code", { className: styles.code, children: ALICE_PROPERTY_ID }), " \u2014 within the next 90 days"] })] }), status === "loading" && (_jsx("div", { className: styles.state, role: "status", "aria-live": "polite", children: "Loading\u2026" })), status === "error" && (_jsxs("div", { className: `${styles.state} ${styles.errorState}`, role: "alert", children: [_jsxs("p", { children: ["Could not load documents \u2014 ", loadError] }), _jsx("button", { type: "button", className: styles.retry, onClick: () => void refresh(), children: "Retry" })] })), status === "ready" && documents.length === 0 && (_jsx("div", { className: styles.state, children: "No documents expiring in the next 90 days." })), status === "ready" && documents.length > 0 && (_jsx("ul", { className: styles.list, children: documents.map((doc) => (_jsx(DocumentRow, { document: doc, isSnoozing: snoozingIds.has(doc.id), onSnooze: () => void snooze(doc.id) }, doc.id))) })), snoozeError && (_jsxs("div", { className: styles.toast, role: "alert", children: ["Snooze failed: ", snoozeError] }))] }));
+}
+//# sourceMappingURL=ExpiringDocumentsPage.js.map

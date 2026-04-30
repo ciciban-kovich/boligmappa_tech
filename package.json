@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "build": "npx tsc -b && npx vite build",
+    "dev": "npx vite",
+    "start": "npx vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
+  }
+}
