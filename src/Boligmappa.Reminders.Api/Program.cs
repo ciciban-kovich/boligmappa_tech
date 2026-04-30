@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using Boligmappa.Reminders.Api.Api.Endpoints;
 using Boligmappa.Reminders.Api.Domain;
 using Boligmappa.Reminders.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddSingleton<IClock, SystemClock>();
 
@@ -27,5 +32,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapPropertyEndpoints();
 
 app.Run();
