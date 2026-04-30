@@ -34,5 +34,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapPropertyEndpoints();
+app.MapDocumentEndpoints();
 
 app.Run();
