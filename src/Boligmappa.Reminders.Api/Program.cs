@@ -1,7 +1,9 @@
 using System.Text.Json.Serialization;
 using Boligmappa.Reminders.Api.Api.Endpoints;
 using Boligmappa.Reminders.Api.Domain;
+using Boligmappa.Reminders.Api.Infrastructure.Auth;
 using Boligmappa.Reminders.Api.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("Default")
             ?? throw new InvalidOperationException("Missing ConnectionStrings:Default")));
 
+builder.Services
+    .AddAuthentication(AuthSchemes.XUserIdHeader)
+    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, StubHeaderAuthenticationHandler>(
+        AuthSchemes.XUserIdHeader, _ => { });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthPolicies.DocumentOwner, policy =>
+    {
+        policy.AddAuthenticationSchemes(AuthSchemes.XUserIdHeader);
+        policy.RequireAuthenticatedUser();
+        policy.Requirements.Add(new DocumentOwnerRequirement());
+    });
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, DocumentOwnerAuthorizationHandler>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -32,6 +51,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapPropertyEndpoints();
 app.MapDocumentEndpoints();
